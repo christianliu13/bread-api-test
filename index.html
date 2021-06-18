@@ -1,0 +1,103 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Christian Liu - Bread Challenge</title>
+    <meta name="description" content="Bread Challenge">
+    <link rel="stylesheet" href="index.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script id='script' src="https://checkout-sandbox.getbread.com/bread.js"
+        data-api-key="7101ea30-8ae3-47ab-a8bd-235860d36f3e"></script>
+</head>
+
+<body>
+    <div>
+        <div class="product-page">
+            <div class="product-container">
+                <h1>Bread Loaf</h1>
+                <h4>$100</h4>
+                <img class="product-image" src="Assets/loaf.jpg">
+                <p>Really good bread, really worth it. Get that bread.</p>
+                <div id="bread-checkout-btn"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var opts = {
+            buttonId: 'bread-checkout-btn',
+            actAsLabel: false,
+            asLowAs: true,
+            shippingOptions: [{
+                typeId: 'ship-type-1',
+                cost: 3299,
+                type: 'Overnight Shipping'
+            }, {
+                typeId: 'ship-type-2',
+                cost: 599,
+                type: 'Standard Shipping'
+            }],
+            items: [{
+                name: 'Bread Loaf',
+                price: 10000,
+                sku: 'LOAF',
+                detailUrl: '/index.html',
+                quantity: 1
+            }],
+            done: function () {
+                if (err) {
+                    console.error("There was an error: " + err);
+                    return;
+                }
+
+                if (tx_token !== undefined) {
+                    console.log(tx_token);
+                }
+                return;
+            },
+            calculateTax: function(shippingContact, billingContact, callback) {
+                let data = 0;
+                if (shippingContact.state == 'NY'){
+                    data = 5;
+                }
+                callback(null, data);
+            }
+        };
+
+        opts.customCSS =
+            '#bread-button{background:rgb(81, 86, 234);line-height:50px;height:50px;display:block;color:#fff;border:0 solid #f4802e;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:400;text-align:center;vertical-align:middle;transition:all .3s ease;border-radius:40px;cursor:pointer}#bread-button.bread-btn:hover{background:lightblue}#bread-as-low-as:before{content:"As low as "}.bread-for:before{content:"For "}.bread-text{color:red}';
+
+
+        opts.onCustomerClose = function (err, customer) {
+            if (err !== null) {
+                console.error("An error occurred getting customer close data.");
+                return;
+            }
+            var prequalStatus = customer.state;
+            switch (prequalStatus) {
+                case 'PREQUALIFIED':
+                    console.log(customer.email + " was prequalified for financing.");
+                    break;
+                case 'PARTIALLY_PREQUALIFIED':
+                    console.log(customer.email + " was partially prequalified for financing.");
+                    break;
+                case 'NOT_PREQUALIFIED':
+                    console.log(customer.email + " was not prequalified for financing.");
+                    break;
+                case 'ABANDONED':
+                    if (customer.email === undefined || customer.email === null) {
+                        console.log("Unknown customer abandoned their prequalification attempt.");
+                    } else {
+                        console.log(customer.email + " abandoned their prequalification attempt.");
+                    }
+                    break;
+            }
+        }
+        bread.checkout(opts);
+    </script>
+</body>
+
+</html>
